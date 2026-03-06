@@ -12,11 +12,13 @@ Zetto operates entirely on voice using the Gemini Live API. It tracks your retri
 
 ## Technical Stack
 
- * Frontend: Next.js 15 (App Router)
- * Styling: Tailwind CSS
- * AI Engine: Gemini 2.5 Flash (Native Audio) via WebSockets
- * State Management: TanStack Query
- * Database: Cloudflare KV (or Supabase) for user Skill Map persistence
+ * **Framework:** Expo (React Native) — single codebase targeting iOS, Android, and Web
+ * **Navigation:** Expo Router (file-based, App-Router style)
+ * **Styling:** NativeWind v4 (Tailwind CSS for React Native)
+ * **AI Engine:** Gemini 2.5 Flash (Native Audio) via WebSockets
+ * **State Management:** TanStack Query v5
+ * **Audio:** expo-av for microphone capture
+ * **Database:** Cloudflare KV (or Supabase) for user Skill Map persistence
 
 ## Key Features
 
@@ -48,6 +50,7 @@ A weekly calibration session shifts the AI into a coaching persona. You provide 
 
 ## Local Setup
  * Clone the repository.
- * Run npm install.
- * Configure your .env.local with your Google GenAI API key and database credentials.
- * Run npm run dev to start the development server.
+ * Run `npm install`.
+ * Configure your `.env.local` with your Google GenAI API key and database credentials.
+ * Run `npm start` to open the Expo dev server.
+ * Press `w` for web, `a` for Android emulator, `i` for iOS simulator.
