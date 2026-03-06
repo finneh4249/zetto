@@ -25,13 +25,9 @@ export function TranscriptView({ entry }: TranscriptViewProps) {
 
       {/* Render words — tap for JIT translation */}
       <View className="flex-row flex-wrap gap-x-1">
-        {entry.words.map((word) => (
-          <TouchableOpacity
-            key={word.id}
-            onPress={word.onPress}
-            activeOpacity={word.onPress ? 0.6 : 1}
-          >
-            <View>
+        {entry.words.map((word) => {
+          const wordContents = (
+            <>
               {word.furigana ? (
                 <Text className="text-center text-xs text-brand-text-secondary">
                   {word.furigana}
@@ -44,9 +40,17 @@ export function TranscriptView({ entry }: TranscriptViewProps) {
               >
                 {word.surface}
               </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+            </>
+          );
+
+          return word.onPress ? (
+            <TouchableOpacity key={word.id} onPress={word.onPress} activeOpacity={0.6}>
+              <View>{wordContents}</View>
+            </TouchableOpacity>
+          ) : (
+            <View key={word.id}>{wordContents}</View>
+          );
+        })}
       </View>
 
       {entry.translation ? (
