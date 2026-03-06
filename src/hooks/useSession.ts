@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { SessionState, TranscriptEntry } from '@/types';
 
@@ -15,8 +15,23 @@ export function useSession() {
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
 
   const promptStartRef = useRef<number | null>(null);
+  // All pending simulation timeouts — cleared on stop or unmount to prevent
+  // state updates after the component has unmounted or a new session has started.
+  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  /** Cancel all pending simulation timeouts. */
+  const clearTimeouts = useCallback(() => {
+    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
+  }, []);
+
+  // Clean up on unmount so no orphaned timeouts update state.
+  useEffect(() => () => clearTimeouts(), [clearTimeouts]);
 
   const startListening = useCallback(() => {
+    // Cancel any in-flight simulation from a previous interaction.
+    clearTimeouts();
+
     setState('listening');
     promptStartRef.current = Date.now();
 
@@ -24,7 +39,7 @@ export function useSession() {
       // Prime the topic on first session start
       setTopic('Transit Tickets — きっぷ');
       // Simulate initial AI prompt
-      setTimeout(() => {
+      const t1 = setTimeout(() => {
         setState('speaking');
         const aiEntry: TranscriptEntry = {
           id: 'ai-0',
@@ -39,10 +54,12 @@ export function useSession() {
           timestamp: new Date().toLocaleTimeString(),
         };
         setTranscript((prev) => [...prev, aiEntry]);
-        setTimeout(() => setState('listening'), 800);
+        const t2 = setTimeout(() => setState('listening'), 800);
+        timeoutsRef.current.push(t2);
       }, 600);
+      timeoutsRef.current.push(t1);
     }
-  }, [transcript.length]);
+  }, [transcript.length, clearTimeouts]);
 
   const stopListening = useCallback(() => {
     if (promptStartRef.current !== null) {
@@ -51,8 +68,11 @@ export function useSession() {
     }
     setState('processing');
 
+    // Cancel any in-flight simulation before scheduling a new one.
+    clearTimeouts();
+
     // Simulate user response being added to the transcript
-    setTimeout(() => {
+    const t = setTimeout(() => {
       const userEntry: TranscriptEntry = {
         id: `user-${Date.now()}`,
         speaker: 'user',
@@ -69,7 +89,8 @@ export function useSession() {
       setTranscript((prev) => [...prev, userEntry]);
       setState('idle');
     }, 500);
-  }, []);
+    timeoutsRef.current.push(t);
+  }, [clearTimeouts]);
 
   return {
     state,
