@@ -12,11 +12,13 @@ Zetto operates entirely on voice using the Gemini Live API. It tracks your retri
 
 ## Technical Stack
 
- * Frontend: Next.js 15 (App Router)
- * Styling: Tailwind CSS
- * AI Engine: Gemini 2.5 Flash (Native Audio) via WebSockets
- * State Management: TanStack Query
- * Database: Cloudflare KV (or Supabase) for user Skill Map persistence
+ * **Framework:** Expo (React Native) — single codebase targeting iOS, Android, and Web
+ * **Navigation:** Expo Router (file-based, App-Router style)
+ * **Styling:** NativeWind v4 (Tailwind CSS for React Native)
+ * **AI Engine:** Gemini 2.5 Flash (Native Audio) via WebSockets
+ * **State Management:** TanStack Query v5
+ * **Audio:** expo-av for microphone capture
+ * **Database:** Cloudflare KV (or Supabase) for user Skill Map persistence
 
 ## Key Features
 
@@ -48,6 +50,40 @@ A weekly calibration session shifts the AI into a coaching persona. You provide 
 
 ## Local Setup
  * Clone the repository.
- * Run npm install.
- * Configure your .env.local with your Google GenAI API key and database credentials.
- * Run npm run dev to start the development server.
+ * Run `npm install`.
+ * Configure your `.env.local` with your Google GenAI API key and database credentials.
+ * Run `npm start` to open the Expo dev server.
+ * Press `w` for web, `a` for Android emulator, `i` for iOS simulator.
+
+## Deployment
+
+### GitHub Pages (automatic, recommended)
+
+1. Push to the `main` branch — the [deploy workflow](.github/workflows/deploy.yml) will build the static web bundle and publish it automatically.
+2. In your repository **Settings → Pages**, set the source to **GitHub Actions**.
+3. Your live URL will be `https://<your-github-username>.github.io/zetto`.
+
+> The `experiments.baseUrl` in `app.json` is already set to `/zetto` to match the GitHub Pages subdirectory.
+
+### Netlify (zero-config)
+
+1. Connect the repository in the [Netlify dashboard](https://app.netlify.com).
+2. Netlify auto-detects the `netlify.toml` — no extra configuration needed.
+3. Build command: `npm run build:web` — publish directory: `dist`.
+
+### Vercel (zero-config)
+
+1. Import the repository in the [Vercel dashboard](https://vercel.com/new).
+2. Vercel reads `vercel.json` automatically — no extra configuration needed.
+3. Build command: `npm run build:web` — output directory: `dist`.
+
+> **Note:** For Netlify and Vercel deployments the app is served from the root (`/`), so remove the `experiments.baseUrl` key from `app.json` before deploying to those platforms.
+
+### Manual / self-hosted
+
+```bash
+npm run build:web   # outputs a static bundle to dist/
+npx serve dist      # preview locally on http://localhost:3000
+```
+
+Copy the `dist/` directory to any static host (S3, Cloudflare Pages, Firebase Hosting, etc.).

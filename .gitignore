@@ -78,6 +78,14 @@ web_modules/
 .next
 out
 
+# Expo / React Native
+.expo/
+android/
+ios/
+*.orig.*
+web-build/
+dist/
+
 # Nuxt.js build / generate output
 .nuxt
 dist
