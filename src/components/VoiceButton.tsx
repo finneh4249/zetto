@@ -14,6 +14,11 @@ export function VoiceButton({ isListening, onPress }: VoiceButtonProps) {
         isListening ? 'bg-red-500' : 'bg-brand-accent'
       }`}
       style={{ elevation: 4 }}
+      accessibilityRole="button"
+      accessibilityLabel={isListening ? 'Stop voice recording' : 'Start voice recording'}
+      accessibilityHint={
+        isListening ? 'Double tap to stop voice input' : 'Double tap to start voice input'
+      }
     >
       {isListening ? (
         <View className="flex-row items-end gap-0.5">
