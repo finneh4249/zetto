@@ -80,7 +80,13 @@ export default function SessionScreen() {
 
           <VoiceButton
             isListening={state === 'listening'}
-            onPress={state === 'listening' ? stopListening : startListening}
+            onPress={() => {
+              if (state === 'listening') {
+                stopListening();
+              } else if (state === 'idle') {
+                startListening();
+              }
+            }}
           />
 
           <View className="w-16" />
