@@ -10,20 +10,23 @@ const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!;
  * Platform-aware storage adapter.
  *
  * On React Native (iOS / Android) we use AsyncStorage.
- * On web we use localStorage — but guard against the SSR/Node.js phase where
- * `window` / `localStorage` are not defined.
+ * On web we use localStorage, but guard against the SSR/Node.js phase where
+ * `window` is not defined. Expo's static renderer injects a partial
+ * `localStorage` stub (via --localstorage-file) that lacks real methods, so
+ * `typeof localStorage` alone is not a reliable SSR check — `typeof window`
+ * is the correct boundary.
  */
 const webStorage = {
   getItem: (key: string): Promise<string | null> => {
-    if (typeof localStorage === 'undefined') return Promise.resolve(null);
+    if (typeof window === 'undefined') return Promise.resolve(null);
     return Promise.resolve(localStorage.getItem(key));
   },
   setItem: (key: string, value: string): Promise<void> => {
-    if (typeof localStorage !== 'undefined') localStorage.setItem(key, value);
+    if (typeof window !== 'undefined') localStorage.setItem(key, value);
     return Promise.resolve();
   },
   removeItem: (key: string): Promise<void> => {
-    if (typeof localStorage !== 'undefined') localStorage.removeItem(key);
+    if (typeof window !== 'undefined') localStorage.removeItem(key);
     return Promise.resolve();
   },
 };
