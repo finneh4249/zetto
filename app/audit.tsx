@@ -21,6 +21,12 @@ const EFFORT_LABELS: Record<number, string> = {
   10: 'Overwhelming',
 };
 
+function effortAccent(n: number): string {
+  if (n <= 5) return '#5B8C5A'; // matcha
+  if (n <= 7) return '#D4A03C'; // amber
+  return '#D94032';             // vermilion
+}
+
 export default function AuditScreen() {
   const router = useRouter();
   const [effortRating, setEffortRating] = useState<number | null>(null);
@@ -28,87 +34,138 @@ export default function AuditScreen() {
 
   const handleSubmit = () => {
     if (effortRating === null) return;
-    // TODO: persist rating to database and adjust difficulty pipeline
     setSubmitted(true);
   };
 
   if (submitted) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-brand-bg px-6">
-        <Text className="text-5xl">✅</Text>
-        <Text className="mt-4 text-center text-xl font-bold text-brand-text">
+      <SafeAreaView className="flex-1 items-center justify-center bg-brand-sumi px-6">
+        {/* Decorative confetti strip */}
+        <View className="mb-6 flex-row gap-2">
+          {['#D94032', '#D4A03C', '#5B8C5A', '#D94032', '#D4A03C'].map((c, i) => (
+            <View
+              key={i}
+              className="h-2 w-8 rounded-full"
+              style={{ backgroundColor: c }}
+            />
+          ))}
+        </View>
+
+        <Text className="text-7xl">✅</Text>
+        <Text
+          className="mt-6 text-center text-2xl font-bold text-brand-warm"
+          style={{ fontFamily: 'NotoSansJP_700Bold' }}
+        >
           Calibration saved
         </Text>
-        <Text className="mt-2 text-center text-sm text-brand-text-secondary">
-          Your upcoming week has been adjusted based on your rating.
+        <Text
+          className="mt-3 text-center text-sm leading-relaxed text-brand-stone"
+          style={{ fontFamily: 'NotoSansJP_400Regular' }}
+        >
+          Your upcoming week has been adjusted based{'\n'}on your effort rating.
         </Text>
         <TouchableOpacity
-          className="mt-8 rounded-xl bg-brand-accent px-8 py-4"
-          onPress={() => router.replace('/')}
+          className="mt-10 rounded-xl bg-brand-vermilion px-10 py-5"
+          onPress={() => router.replace('/dashboard')}
           activeOpacity={0.85}
         >
-          <Text className="font-bold text-brand-bg">Back to Home</Text>
+          <Text
+            className="text-base font-bold text-white"
+            style={{ fontFamily: 'NotoSansJP_700Bold' }}
+          >
+            Back to Dashboard
+          </Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-brand-bg" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-brand-sumi" edges={['bottom']}>
       <ScrollView
         className="flex-1 px-6"
         contentContainerStyle={{ paddingVertical: 24 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Intro */}
-        <Text className="text-2xl font-bold text-brand-text">Weekly Audit</Text>
-        <Text className="mt-2 text-sm text-brand-text-secondary">
-          Rate the overall effort level of your practice this week. Your answer
-          calibrates next week's difficulty mix.
+        {/* ── Intro ── */}
+        <Text
+          className="text-2xl font-bold text-brand-warm"
+          style={{ fontFamily: 'NotoSansJP_700Bold' }}
+        >
+          Weekly Audit
+        </Text>
+        <Text
+          className="mt-2 text-sm leading-relaxed text-brand-stone"
+          style={{ fontFamily: 'NotoSansJP_400Regular' }}
+        >
+          Rate the overall effort level of your practice this week. Your answer calibrates next week's difficulty mix.
         </Text>
 
-        {/* Rating grid */}
-        <Text className="mb-4 mt-8 font-semibold text-brand-text">
+        {/* ── Rating grid ── */}
+        <Text
+          className="mb-4 mt-8 font-semibold text-brand-warm"
+          style={{ fontFamily: 'NotoSansJP_500Medium' }}
+        >
           Effort rating
         </Text>
-        <View className="flex-row flex-wrap gap-2">
-          {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-            <TouchableOpacity
-              key={n}
-              className={`h-12 w-12 items-center justify-center rounded-xl border ${
-                effortRating === n
-                  ? 'border-brand-accent bg-brand-accent'
-                  : 'border-brand-border bg-brand-surface'
-              }`}
-              onPress={() => setEffortRating(n)}
-              activeOpacity={0.8}
-            >
-              <Text
-                className={`font-bold ${effortRating === n ? 'text-brand-bg' : 'text-brand-text'}`}
+        <View className="flex-row flex-wrap gap-3">
+          {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
+            const selected = effortRating === n;
+            const accent = effortAccent(n);
+            return (
+              <TouchableOpacity
+                key={n}
+                className={`h-14 w-14 items-center justify-center rounded-xl border ${
+                  selected ? 'border-transparent' : 'border-brand-ink bg-brand-tatami'
+                }`}
+                style={selected ? { backgroundColor: accent, borderColor: accent } : {}}
+                onPress={() => setEffortRating(n)}
+                activeOpacity={0.75}
               >
-                {n}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  className={`text-base font-bold ${selected ? 'text-white' : 'text-brand-warm'}`}
+                  style={{ fontFamily: 'IBMPlexMono_400Regular' }}
+                >
+                  {n}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
+        {/* ── Effort label card ── */}
         {effortRating !== null ? (
-          <Text className="mt-3 text-sm text-brand-text-secondary">
-            {effortRating} — {EFFORT_LABELS[effortRating]}
-          </Text>
+          <View
+            className="mt-5 rounded-xl bg-brand-tatami px-5 py-4"
+            style={{ borderLeftWidth: 4, borderLeftColor: effortAccent(effortRating) }}
+          >
+            <Text
+              className="text-xs font-bold uppercase tracking-widest"
+              style={{ fontFamily: 'NotoSansJP_700Bold', color: effortAccent(effortRating) }}
+            >
+              {effortRating} / 10
+            </Text>
+            <Text
+              className="mt-1 text-base font-semibold text-brand-warm"
+              style={{ fontFamily: 'NotoSansJP_500Medium' }}
+            >
+              {EFFORT_LABELS[effortRating]}
+            </Text>
+          </View>
         ) : null}
 
-        {/* Submit */}
+        {/* ── Submit ── */}
         <TouchableOpacity
-          className={`mt-10 items-center rounded-xl px-6 py-5 ${
-            effortRating !== null ? 'bg-brand-accent' : 'bg-brand-surface'
+          className={`mt-8 items-center rounded-xl px-6 py-5 ${
+            effortRating !== null ? 'bg-brand-vermilion' : 'bg-brand-tatami'
           }`}
           onPress={handleSubmit}
           disabled={effortRating === null}
           activeOpacity={0.85}
         >
           <Text
-            className={`font-bold ${effortRating !== null ? 'text-brand-bg' : 'text-brand-muted'}`}
+            className={`font-bold ${effortRating !== null ? 'text-white' : 'text-brand-stone'}`}
+            style={{ fontFamily: 'NotoSansJP_700Bold' }}
           >
             Submit Rating
           </Text>
