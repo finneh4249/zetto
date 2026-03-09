@@ -10,20 +10,21 @@ import {
   NotoSansJP_700Bold,
 } from '@expo-google-fonts/noto-sans-jp';
 import { IBMPlexMono_400Regular } from '@expo-google-fonts/ibm-plex-mono';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
-export default function RootLayout() {
+/** Inner component so it can consume AuthContext. */
+function RootNavigator() {
   const router = useRouter();
   const segments = useSegments();
-  const [isReady, setIsReady] = useState(false);
+  const { session, loading } = useAuth();
 
-  const [loaded, error] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     NotoSansJP_400Regular,
     NotoSansJP_500Medium,
     NotoSansJP_700Bold,
@@ -31,37 +32,28 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    async function checkAuth() {
-      if (!loaded && !error) return;
+    if (loading || (!fontsLoaded && !fontError)) return;
 
-      try {
-        const token = await AsyncStorage.getItem('zetto_auth_token');
-        const inAuthGroup = segments[0] === 'dashboard' || segments[0] === 'session' || segments[0] === 'audit';
+    SplashScreen.hideAsync();
 
-        if (token && !inAuthGroup) {
-          // Logged in but on landing/login
-          router.replace('/dashboard');
-        } else if (!token && inAuthGroup) {
-          // Not logged in but accessing protected route
-          router.replace('/');
-        }
-      } catch (e) {
-        console.error('Auth state error', e);
-      } finally {
-        setIsReady(true);
-        SplashScreen.hideAsync();
-      }
+    const inAuthGroup =
+      segments[0] === 'dashboard' ||
+      segments[0] === 'session' ||
+      segments[0] === 'audit';
+
+    if (session && !inAuthGroup) {
+      router.replace('/dashboard');
+    } else if (!session && inAuthGroup) {
+      router.replace('/');
     }
+  }, [session, loading, fontsLoaded, fontError, segments]);
 
-    checkAuth();
-  }, [loaded, error, segments]);
-
-  if (!isReady) {
+  if (loading || (!fontsLoaded && !fontError)) {
     return null;
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <StatusBar style="light" />
       <Stack
         screenOptions={{
@@ -77,6 +69,16 @@ export default function RootLayout() {
         <Stack.Screen name="session" options={{ title: 'Practice Session', headerBackVisible: true }} />
         <Stack.Screen name="audit" options={{ title: 'Weekly Audit', headerBackVisible: true }} />
       </Stack>
+    </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
+  ActivityIndicator,
   ScrollView,
   Text,
   TextInput,
@@ -8,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '@/utils/supabase';
 import LogoSvg from '../assets/vermilion-box-v2.svg';
 
 export default function LoginScreen() {
@@ -17,10 +18,25 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async () => {
-    await AsyncStorage.setItem('zetto_auth_token', 'mock_token_123');
-    router.replace('/dashboard');
+    if (!email || !password) {
+      setError('Please enter your email and password.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
+    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+
+    setLoading(false);
+    if (authError) {
+      setError(authError.message);
+      return;
+    }
+    // Auth state change in _layout.tsx drives the redirect to /dashboard.
   };
 
   return (
@@ -51,6 +67,19 @@ export default function LoginScreen() {
 
           {/* ── Glass card form ── */}
           <View className="w-full rounded-2xl border border-brand-ink bg-brand-tatami px-6 py-8">
+
+            {/* Error banner */}
+            {error && (
+              <View className="mb-4 rounded-lg bg-red-900/40 border border-red-700 px-4 py-3">
+                <Text
+                  className="text-sm text-red-400"
+                  style={{ fontFamily: 'NotoSansJP_400Regular' }}
+                >
+                  {error}
+                </Text>
+              </View>
+            )}
+
             {/* Email */}
             <View className="mb-5">
               <Text
@@ -68,6 +97,7 @@ export default function LoginScreen() {
                 placeholderTextColor="#6B6560"
                 keyboardType="email-address"
                 autoCapitalize="none"
+                autoComplete="email"
                 className="w-full rounded-xl bg-brand-sumi px-4 py-4 text-brand-warm"
                 style={{
                   fontFamily: 'IBMPlexMono_400Regular',
@@ -93,6 +123,7 @@ export default function LoginScreen() {
                 placeholder="••••••••"
                 placeholderTextColor="#6B6560"
                 secureTextEntry
+                autoComplete="current-password"
                 className="w-full rounded-xl bg-brand-sumi px-4 py-4 text-brand-warm"
                 style={{
                   borderWidth: 1,
@@ -116,13 +147,18 @@ export default function LoginScreen() {
               className="w-full items-center rounded-xl bg-brand-vermilion px-6 py-5"
               onPress={handleLogin}
               activeOpacity={0.85}
+              disabled={loading}
             >
-              <Text
-                className="text-lg font-bold text-white"
-                style={{ fontFamily: 'NotoSansJP_700Bold' }}
-              >
-                Sign In →
-              </Text>
+              {loading ? (
+                <ActivityIndicator color="#ffffff" />
+              ) : (
+                <Text
+                  className="text-lg font-bold text-white"
+                  style={{ fontFamily: 'NotoSansJP_700Bold' }}
+                >
+                  Sign In →
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>

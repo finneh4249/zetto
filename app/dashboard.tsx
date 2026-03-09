@@ -1,4 +1,4 @@
-import { Link, useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import {
   ScrollView,
   Text,
@@ -6,7 +6,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '@/utils/supabase';
+import { useAuth } from '@/context/AuthContext';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -16,11 +17,12 @@ function getGreeting(): string {
 }
 
 export default function DashboardScreen() {
-  const router = useRouter();
+  const { session } = useAuth();
+  const userEmail = session?.user?.email ?? null;
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('zetto_auth_token');
-    router.replace('/');
+    await supabase.auth.signOut();
+    // Navigation back to '/' is handled by the auth state change in _layout.tsx
   };
 
   return (
