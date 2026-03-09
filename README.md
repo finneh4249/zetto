@@ -10,7 +10,13 @@ Legacy language apps rely on cognitive offloading. You tap matching tiles and bu
 
 ## How Zetto Works
 
-Zetto is a voice-first training app built on the Gemini Live API. It measures the exact millisecond gap between the AI prompt and your spoken response. Fast responses escalate complexity. Delayed responses trigger deliberate wait time and micro-hints without breaking conversational character. There is no curriculum. The system adapts to what your production data says you need, not a predetermined syllabus.
+Zetto is built on two pillars of language acquisition research: **comprehensible input** and **pushed output**.
+
+**Comprehensible input** means everything Zetto says to you is calibrated to be just slightly above your current level. Not at your level (too easy, nothing acquired). Not two levels above (incomprehensible, nothing acquired). One notch above. You acquire new grammar and vocabulary by hearing it used naturally in context you can mostly understand. Zetto's speech *is* the immersion environment, tuned to your exact level and adjusted in real time.
+
+**Pushed output** means you don't just listen. You produce. Out loud. Under time pressure. Zetto measures the exact millisecond gap between its prompt and your spoken response. Fast responses escalate complexity. Delayed responses trigger micro-hints without breaking conversational character. Your retrieval latency is the primary signal that drives everything.
+
+There is no curriculum. The system adapts to what your production data says you need, not a predetermined syllabus. The balance between input and output shifts as you advance: early stages are more listening, later stages are more speaking, and by Fly stage you're carrying the conversation while Zetto provides the fine-tuning signal.
 
 Vocabulary is tracked via active generation, not passive recognition. Every token progresses through three production tiers:
 

@@ -22,6 +22,8 @@ The difference is enormous. Recognition is passive. You see four options, one of
 
 This is hard. It's supposed to be hard. The difficulty is the point. Every millisecond you spend retrieving a word from memory is strengthening the neural pathway that makes that word available next time. Zetto measures that retrieval time and uses it to calibrate exactly how hard to push you.
 
+But production alone isn't enough. You also need to *hear* Japanese at the right level. Language acquisition research calls this comprehensible input: exposure to language that's slightly above your current ability, close enough to follow, challenging enough to stretch. Every sentence Zetto speaks is calibrated to be that input. The tutor's own speech is the immersion environment, tuned in real time to your demonstrated level. Early on, you're mostly listening: absorbing sounds, patterns, sentence shapes. As you advance, the balance tips toward production and you're carrying the conversation while Zetto's speech becomes the fine-tuning signal. Both sides of the equation are measured, adaptive, and personal.
+
 ## Progressive overload for language
 
 Zetto doesn't have a curriculum. There's no syllabus. No "Week 3: te-form" that every learner marches through in lockstep regardless of whether they need it.
