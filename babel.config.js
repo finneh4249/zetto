@@ -27,6 +27,17 @@ module.exports = function (api) {
       // if a future release of react-native-css-interop makes the worklets
       // plugin conditional or exposes a dedicated export for the plugin alone.
       require('react-native-css-interop/dist/babel-plugin').default,
+      'inline-react-svg',
+      [
+        'module-resolver',
+        {
+          root: ['./'],
+          alias: {
+            // Only remap specific internal asset calls if needed, not all `@/`
+            // Let tsconfig handle the `@/` mappings natively for most cases
+          },
+        },
+      ],
     ],
   };
 };

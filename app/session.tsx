@@ -8,9 +8,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { TranscriptView } from '@/components/TranscriptView';
-import { VoiceButton } from '@/components/VoiceButton';
-import { useSession } from '@/hooks/useSession';
+import { TranscriptView } from '../src/components/TranscriptView';
+import { VoiceButton } from '../src/components/VoiceButton';
+import { useSession } from '../src/hooks/useSession';
+
+function latencyColour(ms: number): string {
+  if (ms < 2000) return '#5B8C5A'; // matcha — fast
+  if (ms < 4000) return '#D4A03C'; // amber — acceptable
+  return '#D94032';                 // vermilion — slow
+}
 
 export default function SessionScreen() {
   const router = useRouter();
@@ -25,33 +31,45 @@ export default function SessionScreen() {
   }, [transcript.length]);
 
   return (
-    <SafeAreaView className="flex-1 bg-brand-bg" edges={['bottom']}>
-      {/* Topic priming banner */}
+    <SafeAreaView className="flex-1 bg-brand-sumi" edges={['bottom']}>
+      {/* ── Topic priming banner — full-bleed vermilion strip ── */}
       {topic ? (
-        <View className="border-b border-brand-border bg-brand-surface px-6 py-3">
-          <Text className="text-xs font-bold uppercase tracking-widest text-brand-accent">
-            Topic
+        <View className="bg-brand-vermilion px-6 py-4">
+          <Text
+            className="text-xs font-bold uppercase tracking-widest text-white opacity-70"
+            style={{ fontFamily: 'NotoSansJP_700Bold' }}
+          >
+            [ TOPIC ]
           </Text>
-          <Text className="mt-0.5 text-base font-semibold text-brand-text">
+          <Text
+            className="mt-0.5 text-lg font-bold text-white"
+            style={{ fontFamily: 'NotoSansJP_700Bold' }}
+          >
             {topic}
           </Text>
         </View>
       ) : null}
 
-      {/* Transcript */}
+      {/* ── Transcript ── */}
       <ScrollView
         ref={scrollRef}
         className="flex-1 px-6"
-        contentContainerStyle={{ paddingVertical: 16 }}
+        contentContainerStyle={{ paddingVertical: 20 }}
         showsVerticalScrollIndicator={false}
       >
         {transcript.length === 0 ? (
-          <View className="mt-20 items-center">
-            <Text className="text-6xl">🎙</Text>
-            <Text className="mt-4 text-center text-lg text-brand-text">
-              Ready to practise?
+          <View className="mt-24 items-center">
+            <Text className="text-8xl">🎙</Text>
+            <Text
+              className="mt-6 text-center text-xl font-bold text-brand-warm"
+              style={{ fontFamily: 'NotoSansJP_700Bold' }}
+            >
+              Your AI coach is ready.
             </Text>
-            <Text className="mt-2 text-center text-sm text-brand-text-secondary">
+            <Text
+              className="mt-2 text-center text-sm text-brand-stone"
+              style={{ fontFamily: 'NotoSansJP_400Regular' }}
+            >
               Tap the microphone below to start speaking Japanese.
             </Text>
           </View>
@@ -62,20 +80,42 @@ export default function SessionScreen() {
         )}
       </ScrollView>
 
-      {/* Bottom controls */}
-      <View className="border-t border-brand-border bg-brand-surface px-6 py-5">
+      {/* ── Bottom controls — floating bottom-sheet style ── */}
+      <View
+        className="border-t border-brand-ink bg-brand-tatami px-6 py-5"
+        style={{ borderTopLeftRadius: 20, borderTopRightRadius: 20 }}
+      >
         {latencyMs !== null ? (
-          <Text className="mb-3 text-center text-xs text-brand-text-secondary">
-            Response latency: {latencyMs} ms
-          </Text>
+          <View className="mb-4 self-center">
+            <View
+              className="rounded-full px-4 py-1"
+              style={{ backgroundColor: latencyColour(latencyMs) + '22' }}
+            >
+              <Text
+                className="text-xs"
+                style={{
+                  fontFamily: 'IBMPlexMono_400Regular',
+                  color: latencyColour(latencyMs),
+                }}
+              >
+                ⏱ {latencyMs} ms response latency
+              </Text>
+            </View>
+          </View>
         ) : null}
+
         <View className="flex-row items-center justify-between">
           <TouchableOpacity
-            className="rounded-lg border border-brand-border px-4 py-2"
+            className="rounded-xl border border-brand-ink px-5 py-3"
             onPress={() => router.back()}
             activeOpacity={0.8}
           >
-            <Text className="text-sm text-brand-text-secondary">End</Text>
+            <Text
+              className="text-sm font-semibold text-brand-stone"
+              style={{ fontFamily: 'NotoSansJP_500Medium' }}
+            >
+              End
+            </Text>
           </TouchableOpacity>
 
           <VoiceButton
